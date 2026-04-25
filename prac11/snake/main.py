@@ -4,11 +4,9 @@ import random
 
 pygame.init()
 
-# -------------------- Constants --------------------
 CELL_SIZE = 20
 GRID_WIDTH = 30
 GRID_HEIGHT = 20
-
 SCREEN_WIDTH = CELL_SIZE * GRID_WIDTH
 SCREEN_HEIGHT = CELL_SIZE * GRID_HEIGHT
 
