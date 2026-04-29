@@ -1,0 +1,66 @@
+[
+    {
+        "name": "Aruzhan",
+        "email": "aruzhan@gmail.com",
+        "birthday": "2005-04-12",
+        "group": "Friend",
+        "phones": [
+            {
+                "phone": "87011234567",
+                "type": "mobile"
+            }
+        ]
+    },
+    {
+        "name": "Mama",
+        "email": "mama@mail.com",
+        "birthday": "1980-01-20",
+        "group": "Family",
+        "phones": [
+            {
+                "phone": "87021234567",
+                "type": "mobile"
+            }
+        ]
+    },
+    {
+        "name": "Papa",
+        "email": "papa@mail.com",
+        "birthday": "1978-07-15",
+        "group": "Family",
+        "phones": [
+            {
+                "phone": "87271234567",
+                "type": "work"
+            }
+        ]
+    },
+    {
+        "name": "Teacher",
+        "email": "teacher@kbtu.kz",
+        "birthday": "1990-03-03",
+        "group": "Work",
+        "phones": [
+            {
+                "phone": "87005554433",
+                "type": "work"
+            }
+        ]
+    },
+    {
+        "name": "Kate",
+        "email": "kate@gmail.com",
+        "birthday": "2009-03-03",
+        "group": "Friend",
+        "phones": [
+            {
+                "phone": "87011234567",
+                "type": "mobile"
+            },
+            {
+                "phone": "87271234567",
+                "type": "work"
+            }
+        ]
+    }
+]
