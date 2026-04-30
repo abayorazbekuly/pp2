@@ -3,7 +3,6 @@ from pygame.locals import *
 from datetime import datetime
 
 # init
-
 pygame.init()
 pygame.mixer.init()
 
@@ -25,14 +24,19 @@ GOLD = (255, 200, 0)
 LEADERBOARD_FILE = "leaderboard.json"
 SETTINGS_FILE = "settings.json"
 
-# fonts
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+
+
+def asset(filename):
+    return os.path.join(ASSETS_DIR, filename)
+
+
+#fonts
 font_big = pygame.font.SysFont("Verdana", 60)
 font_med = pygame.font.SysFont("Verdana", 30)
-font_sm = pygame.font.SysFont("Verdana", 20)
-font_xs = pygame.font.SysFont("Verdana", 15)
-
-
-#  asset loading if file is missing yk
+font_sm  = pygame.font.SysFont("Verdana", 20)
+font_xs  = pygame.font.SysFont("Verdana", 15)
+#other assets if norm ones are not loading
 def load_img(path, size=None, fallback_color=(180, 50, 200)):
     try:
         img = pygame.image.load(path).convert_alpha()
@@ -45,35 +49,35 @@ def load_img(path, size=None, fallback_color=(180, 50, 200)):
     return img
 
 
-BG_IMG = load_img("AnimatedStreet.png", (SCREEN_W, SCREEN_H))
+BG_IMG = load_img(asset("AnimatedStreet.png"), (SCREEN_W, SCREEN_H))
 
 try:
-    crash_sound = pygame.mixer.Sound("crash.wav")
+    crash_sound = pygame.mixer.Sound(asset("crash.wav"))
 except Exception:
     crash_sound = None
 
-# Pre-load every sprite once so classes never hit the disk again
+# pre-load every sprite once so classes never hit the disk again
 IMGS = {
-    "player": load_img("Player.png"),
-    "enemy": load_img("Enemy.png"),
-    "coin1": load_img("Coin.png", (40, 40)),
-    "coin2": load_img("Coins.png", (40, 40)),
-    "coin3": load_img("MoreCoins.png", (40, 40)),
-    "barrier": load_img("Barrier.png", (70, 45)),
-    "oil": load_img("Oil.png", (55, 35)),
-    "pothole": load_img("Pothole.png", (55, 40)),
-    "moving_barrier": load_img("MovingBarrier.png", (90, 45)),
-    "speed_bump": load_img("SpeedBump.png", (100, 35)),
-    "nitro_strip": load_img("NitroStrip.png", (100, 35)),
-    "nitro": load_img("Nitro.png", (45, 45)),
-    "shield": load_img("Shield.png", (45, 45)),
-    "repair": load_img("Repair.png", (45, 45)),
+    "player": load_img(asset("Player.png")),
+    "enemy": load_img(asset("Enemy.png")),
+    "coin1": load_img(asset("Coin.png"), (40, 40)),
+    "coin2": load_img(asset("Coins.png"), (40, 40)),
+    "coin3": load_img(asset("MoreCoins.png"), (40, 40)),
+    "barrier": load_img(asset("Barrier.png"), (70, 45)),
+    "oil": load_img(asset("Oil.png"), (55, 35)),
+    "pothole": load_img(asset("Pothole.png"), (55, 40)),
+    "moving_barrier": load_img(asset("MovingBarrier.png"), (90, 45)),
+    "speed_bump": load_img(asset("SpeedBump.png"), (100, 35)),
+    "nitro_strip": load_img(asset("NitroStrip.png"), (100, 35)),
+    "nitro": load_img(asset("Nitro.png"), (45, 45)),
+    "shield": load_img(asset("Shield.png"), (45, 45)),
+    "repair": load_img(asset("Repair.png"), (45, 45)),
 }
 
 
-# ═══════════════════════════════════════════════════════
-#  PERSISTENCE
-# ═══════════════════════════════════════════════════════
+
+#  constants
+
 def load_settings():
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE) as f:
@@ -111,9 +115,6 @@ def add_to_leaderboard(name, score, distance, coins):
     save_leaderboard(data)
 
 
-# ═══════════════════════════════════════════════════════
-#  HELPERS
-# ═══════════════════════════════════════════════════════
 def draw_text(text, font, color, x, y):
     DISPLAYSURF.blit(font.render(text, True, color), (x, y))
 
@@ -137,12 +138,11 @@ def tint_image(img, color_name):
 
 
 def safe_x(player_cx, margin=45):
-    """Return a random x that is at least `margin` pixels away from player."""
     for _ in range(60):
         x = random.randint(40, SCREEN_W - 40)
         if abs(x - player_cx) > margin:
             return x
-    return random.randint(40, SCREEN_W - 40)  # give up after 60 tries
+    return random.randint(40, SCREEN_W - 40)
 
 
 def calc_score(coins, distance, power_bonus):
@@ -154,9 +154,8 @@ def play_sound(enabled):
         crash_sound.play()
 
 
-# ═══════════════════════════════════════════════════════
-#  SPRITES
-# ═══════════════════════════════════════════════════════
+
+#sprites
 class Player(pygame.sprite.Sprite):
     BASE_SPEED = 5
 
@@ -264,7 +263,7 @@ class RoadEvent(pygame.sprite.Sprite):
 
 class PowerUp(pygame.sprite.Sprite):
     KINDS = ["nitro", "shield", "repair"]
-    TIMEOUT = 7
+    TIMEOUT = 5
 
     def __init__(self, player_cx):
         super().__init__()
@@ -288,9 +287,7 @@ class PowerUp(pygame.sprite.Sprite):
             self._place(player_cx)
 
 
-# ═══════════════════════════════════════════════════════
-#  SCREENS
-# ═══════════════════════════════════════════════════════
+#screens
 def ask_username():
     name = ""
     while True:
@@ -401,9 +398,7 @@ def settings_screen(settings):
         clock.tick(FPS)
 
 
-# ═══════════════════════════════════════════════════════
-#  GAME LOOP
-# ═══════════════════════════════════════════════════════
+#game loop
 def game_loop(settings, username):
     # ── Per-difficulty setup ──────────────────────────
     diff = settings["difficulty"]
@@ -438,7 +433,6 @@ def game_loop(settings, username):
 
     saved = False  # guard: only write leaderboard entry once
 
-    # ── Inner helpers (use closure state) ────────────
     def finish_run():
         nonlocal saved
         final = calc_score(coins_collected, distance, power_bonus)
@@ -454,7 +448,7 @@ def game_loop(settings, username):
         active_power = None
         play_sound(settings["sound"])
 
-    # ── Main loop ─────────────────────────────────────
+    #Main loop
     while True:
         # Events
         for ev in pygame.event.get():
@@ -476,7 +470,6 @@ def game_loop(settings, username):
         else:
             eff_speed = enemy_speed
 
-        # ── Player slow effect ────────────────────────
         player.speed = 3 if time.time() < slow_until else Player.BASE_SPEED
 
         # ── Difficulty scaling: add sprites as distance grows ──
@@ -490,7 +483,6 @@ def game_loop(settings, username):
             obstacles.add(o);
             all_sprites.add(o)
 
-        # ── Update sprites ────────────────────────────
         player.move()
         for s in enemies:   s.update(pcx, eff_speed)
         for s in coins:     s.update(pcx, coin_speed)
@@ -498,7 +490,6 @@ def game_loop(settings, username):
         for s in road_evts: s.update(pcx, eff_speed)
         for s in powerups:  s.update(pcx, coin_speed)
 
-        # ── Coin collection ───────────────────────────
         coin_hit = pygame.sprite.spritecollideany(player, coins)
         if coin_hit:
             coins_collected += coin_hit.weight
@@ -507,7 +498,6 @@ def game_loop(settings, username):
                 enemy_speed += 1
                 next_speedup += 5
 
-        # ── Power-up collection ───────────────────────
         pu_hit = pygame.sprite.spritecollideany(player, powerups)
         if pu_hit and active_power is None:
             if pu_hit.kind == "nitro":
@@ -528,8 +518,6 @@ def game_loop(settings, username):
                     nearest._place(pcx)
                 power_bonus += 15
             pu_hit._place(pcx)
-
-        # ── Obstacle collision ────────────────────────
         obs_hit = pygame.sprite.spritecollideany(player, obstacles)
         if obs_hit:
             if obs_hit.kind == "oil":
@@ -542,7 +530,6 @@ def game_loop(settings, username):
                 time.sleep(0.5)
                 return finish_run()
 
-        # ── Road-event collision ──────────────────────
         rev_hit = pygame.sprite.spritecollideany(player, road_evts)
         if rev_hit:
             if rev_hit.kind == "speed_bump":
@@ -562,7 +549,6 @@ def game_loop(settings, username):
                     time.sleep(0.5)
                     return finish_run()
 
-        # ── Enemy collision ───────────────────────────
         enemy_hit = pygame.sprite.spritecollideany(player, enemies)
         if enemy_hit:
             if active_power == "shield":
@@ -572,12 +558,10 @@ def game_loop(settings, username):
                 time.sleep(0.5)
                 return finish_run()
 
-        # ── Distance & finish ─────────────────────────
         distance += eff_speed * 0.05
         if distance >= finish_dist:
             return finish_run()
 
-        # ── Draw ──────────────────────────────────────
         DISPLAYSURF.blit(BG_IMG, (0, 0))
 
         for s in all_sprites:
@@ -599,10 +583,6 @@ def game_loop(settings, username):
         pygame.display.update()
         clock.tick(FPS)
 
-
-# ═══════════════════════════════════════════════════════
-#  MAIN MENU
-# ═══════════════════════════════════════════════════════
 def main_menu():
     settings = load_settings()
 
@@ -652,5 +632,4 @@ def main_menu():
         clock.tick(FPS)
 
 
-# ─────────────────────── entry point ────────────────────────
 main_menu()
